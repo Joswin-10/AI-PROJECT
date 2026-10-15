@@ -149,16 +149,16 @@ class DemoState:
             {
                 "block_number": 0,
                 "timestamp": time.strftime("%H:%M:%S"),
-                "event": "Genesis Block Deployed",
+                "event": "Genesis Block",
                 "round": 0,
                 "tx_hash": "0x0000000000000000000000000000000000000000",
                 "gas_used": 21000,
                 "status": "CONFIRMED",
-                "details": f"BC-FL Service Market Smart Contract Initialized. Defense: {self.defense_method} | Malicious Nodes: {len(self.malicious_clients)}/100 ({int(self.malicious_ratio*100)}%)"
+                "details": f"Initialized with {self.num_clients} nodes ({len(self.malicious_clients)} adversaries). Defense: {self.defense_method}."
             }
         ]
         self.recent_events: List[str] = [
-            f"BC-FL Initialized: {self.num_clients} nodes, {len(self.malicious_clients)} adversaries, Defense: {self.defense_method}."
+            f"[SYS] Initialized {self.num_clients} edge nodes. Defense: {self.defense_method}."
         ]
 
 
@@ -235,16 +235,16 @@ def step_round(state: DemoState) -> Dict:
         slashed_block = {
             "block_number": len(state.blockchain_blocks),
             "timestamp": time.strftime("%H:%M:%S"),
-            "event": f"🚨 POISONING DETECTED & SLASHED: Node #{cid}",
+            "event": f"Rejected: Node #{cid} (Slashed)",
             "round": rd,
             "tx_hash": tx_hash,
             "status": "SLASHED",
             "participants": [cid],
             "gas_used": 89000,
-            "details": f"Adversary Node #{cid} attempted {state.attack_type}. Intercepted via {state.defense_method}. Penalty: -{int(slash_amount)} FL slashed. Node permanently blacklisted from MAB pool."
+            "details": f"Node #{cid} flagged by {state.defense_method} ({state.attack_type}). Penalty: -{int(slash_amount)} FL. Excluded from MAB pool."
         }
         state.blockchain_blocks.append(slashed_block)
-        state.recent_events.append(f"🚨 Round {rd}: Adversary Node #{cid} caught by {state.defense_method}! Slashed -{int(slash_amount)} FL tokens.")
+        state.recent_events.append(f"[AUDIT] Round {rd}: Node #{cid} flagged by {state.defense_method}. Slashed {int(slash_amount)} FL.")
 
     # 4. Calculate Shapley values for verified clients
     batch_qualities = [state.client_meta[cid]["quality"] for cid in verified_clients]
@@ -274,34 +274,31 @@ def step_round(state: DemoState) -> Dict:
         state.explored[cid] = client_shapley
 
     # 5. Global Model Aggregation & Convergence Dynamics
-    # Impact of Attack vs Defense:
     unmitigated_attacks = attacks_in_batch - len(slashed_in_batch)
 
     if unmitigated_attacks > 0 and state.defense_method == "None":
-        # POISONING CONTAMINATES THE GLOBAL MODEL!
-        # Accuracy plummets or stalls drastically, loss spikes
+        # POISONING CONTAMINATES THE GLOBAL MODEL
         penalty = 8.5 * unmitigated_attacks + random.uniform(2.0, 5.0)
         state.global_accuracy = max(11.0, round(state.global_accuracy - penalty, 2))
         state.global_loss = min(3.8, round(state.global_loss + 0.45 * unmitigated_attacks + random.uniform(0.1, 0.25), 4))
 
-        # Compromised block
         tx_hash = "0x" + "".join(random.choices("0123456789abcdef", k=40))
         compromised_block = {
             "block_number": len(state.blockchain_blocks),
             "timestamp": time.strftime("%H:%M:%S"),
-            "event": f"⚠️ VULNERABLE AGGREGATION: Model Poisoned (Round {rd})",
+            "event": f"Block #{rd}: Compromised ({unmitigated_attacks} Adversaries)",
             "round": rd,
             "tx_hash": tx_hash,
             "status": "COMPROMISED",
             "participants": selected_clients,
             "gas_used": 65000,
-            "details": f"FedAvg merged {unmitigated_attacks} poisoned update(s) without Byzantine filter. Global accuracy dropped by {round(penalty, 1)}%."
+            "details": f"Aggregated {unmitigated_attacks} unverified update(s). Accuracy: {state.global_accuracy}%."
         }
         state.blockchain_blocks.append(compromised_block)
-        state.recent_events.append(f"⚠️ Round {rd}: Model poisoned by {unmitigated_attacks} adversarial update(s)! Accuracy fell to {state.global_accuracy}%.")
+        state.recent_events.append(f"[WARN] Round {rd}: {unmitigated_attacks} poisoned update(s) merged into model. Accuracy: {state.global_accuracy}%.")
 
     else:
-        # DEFENSE ACTIVE OR ALL PARTICIPANTS HONEST: Healthy convergence!
+        # DEFENSE ACTIVE OR ALL PARTICIPANTS HONEST
         if state.selection_method == "Bandit":
             target_acc = 10.0 + (77.5 * (1.0 - math.exp(-0.16 * rd))) + random.uniform(-0.4, 0.4)
             state.global_accuracy = min(88.5, round(target_acc, 2))
@@ -312,21 +309,20 @@ def step_round(state: DemoState) -> Dict:
             state.global_accuracy = min(49.5, round(target_acc, 2))
             state.global_loss = max(0.95, round(2.30 * math.exp(-0.045 * rd) + random.uniform(-0.03, 0.03), 4))
 
-        # Verified Settlement Block
         tx_hash = "0x" + "".join(random.choices("0123456789abcdef", k=40))
         verified_block = {
             "block_number": len(state.blockchain_blocks),
             "timestamp": time.strftime("%H:%M:%S"),
-            "event": f"✅ BLOCK MINED: Round {rd} Verified ({state.defense_method})",
+            "event": f"Block #{rd}: Verified ({state.defense_method})",
             "round": rd,
             "tx_hash": tx_hash,
             "status": "VERIFIED",
             "participants": verified_clients,
             "gas_used": 58000 + len(verified_clients) * 11000,
-            "details": f"Aggregated {len(verified_clients)} verified node(s). Defense: {state.defense_method}. Model Accuracy: {state.global_accuracy}%."
+            "details": f"Aggregated {len(verified_clients)} verified update(s). Accuracy: {state.global_accuracy}%."
         }
         state.blockchain_blocks.append(verified_block)
-        state.recent_events.append(f"✅ Round {rd}: {len(verified_clients)} verified updates aggregated via {state.defense_method}. Acc: {state.global_accuracy}%.")
+        state.recent_events.append(f"[INFO] Round {rd}: {len(verified_clients)} updates aggregated ({state.defense_method}). Accuracy: {state.global_accuracy}%.")
 
     resistance_pct = round((state.attacks_intercepted / max(1, state.attacks_attempted)) * 100, 1)
 

@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BC-FL | Blockchain-Based Decentralized & Secure Federated Learning</title>
-  <meta name="description" content="Interactive demo dashboard for Blockchain-based Federated Learning with Byzantine Poisoning Attacks and Consensus Defense (Information Sciences 2024).">
+  <title>BC-FL System Console</title>
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -17,35 +16,21 @@
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <!-- Background Glow FX -->
-  <div class="bg-glow glow-1"></div>
-  <div class="bg-glow glow-2"></div>
-
   <div class="app-container">
     <!-- Top Header -->
     <header class="app-header">
       <div class="header-branding">
-        <div class="logo-badge">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-            <polyline points="2 17 12 22 22 17"></polyline>
-            <polyline points="2 12 12 17 22 12"></polyline>
-          </svg>
-        </div>
-        <div>
-          <h1 class="app-title">BC-FL: Secure AI Market Explorer</h1>
-          <p class="app-subtitle">Towards Blockchain-Enabled Decentralized and Secure Federated Learning • Info. Sciences 2024</p>
-        </div>
+        <h1 class="app-title">BC-FL System Console</h1>
       </div>
 
       <div class="header-status">
         <div class="status-pill server-status" id="pill-defense-status">
           <span class="status-dot pulse-emerald" id="dot-defense"></span>
-          <span id="text-defense-status">Defense: <strong>Cosine-Filter Active</strong></span>
+          <span id="text-defense-status">Defense: <strong>Cosine Distance</strong></span>
         </div>
         <div class="status-pill device-status">
           <span class="status-dot"></span>
-          <span>Model: <strong>ShuffleNetV2</strong> • CIFAR-10</span>
+          <span>ShuffleNetV2 • CIFAR-10</span>
         </div>
       </div>
     </header>
@@ -54,76 +39,62 @@
     <section class="toolbar-section card-glass">
       <div class="controls-left">
         <button id="btn-start" class="btn btn-primary">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-          </svg>
           <span id="btn-start-label">Start Training</span>
         </button>
 
         <button id="btn-step" class="btn btn-secondary">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="5 4 15 12 5 20 5 4"></polygon>
-            <line x1="19" y1="5" x2="19" y2="19"></line>
-          </svg>
-          <span>Step 1 Round</span>
+          <span>Step Round</span>
         </button>
 
         <button id="btn-reset" class="btn btn-danger-outline">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
-          </svg>
           <span>Reset</span>
         </button>
       </div>
 
       <div class="controls-right">
-        <!-- Blockchain Byzantine Defense Dropdown -->
         <div class="control-group">
-          <label for="select-defense" class="text-emerald font-semibold">🛡️ Blockchain Defense</label>
-          <select id="select-defense" class="form-select border-emerald">
-            <option value="Cosine-Filter" selected>Cosine-Filter (Proof-of-Direction)</option>
-            <option value="Multi-Krum">Multi-Krum Byzantine Consensus</option>
-            <option value="Trimmed-Mean">Coordinate-wise Trimmed-Mean</option>
-            <option value="None">None (Vulnerable FedAvg)</option>
+          <label for="select-defense">Defense</label>
+          <select id="select-defense" class="form-select">
+            <option value="Cosine-Filter" selected>Cosine Distance</option>
+            <option value="Multi-Krum">Multi-Krum</option>
+            <option value="Trimmed-Mean">Trimmed Mean</option>
+            <option value="None">Disabled (FedAvg)</option>
           </select>
         </div>
 
-        <!-- Adversary Attack Vector -->
         <div class="control-group">
-          <label for="select-attack-type" class="text-rose font-semibold">⚔️ Attack Vector</label>
-          <select id="select-attack-type" class="form-select border-rose">
-            <option value="Sign-Flipping" selected>Byzantine Sign-Flipping</option>
-            <option value="Label-Flipping">Label-Flipping Poisoning</option>
-            <option value="Extreme-Noise">Extreme Gaussian Noise</option>
+          <label for="select-attack-type">Attack</label>
+          <select id="select-attack-type" class="form-select">
+            <option value="Sign-Flipping" selected>Sign Flipping</option>
+            <option value="Label-Flipping">Label Flipping</option>
+            <option value="Extreme-Noise">Gaussian Noise</option>
           </select>
         </div>
 
-        <!-- Adversary Ratio -->
         <div class="control-group">
           <label for="select-malicious-ratio">Adversaries</label>
           <select id="select-malicious-ratio" class="form-select">
-            <option value="0.0">0% (Clean)</option>
-            <option value="0.10">10% Malicious</option>
-            <option value="0.20" selected>20% Malicious</option>
-            <option value="0.30">30% Malicious</option>
-            <option value="0.40">40% Malicious</option>
+            <option value="0.0">0%</option>
+            <option value="0.10">10%</option>
+            <option value="0.20" selected>20%</option>
+            <option value="0.30">30%</option>
+            <option value="0.40">40%</option>
           </select>
         </div>
 
-        <!-- Algorithm Selection -->
         <div class="control-group">
-          <label for="select-algo">Client Selector</label>
+          <label for="select-algo">Selector</label>
           <select id="select-algo" class="form-select">
-            <option value="Bandit" selected>Bandit (MAB + Slashing)</option>
-            <option value="Random">Random Selection</option>
+            <option value="Bandit" selected>Bandit (MAB)</option>
+            <option value="Random">Random</option>
           </select>
         </div>
 
         <div class="control-group">
-          <label for="select-sample">Batch Size</label>
+          <label for="select-sample">Batch</label>
           <select id="select-sample" class="form-select">
             <option value="3">3 Clients</option>
-            <option value="4" selected>4 Clients (Default)</option>
+            <option value="4" selected>4 Clients</option>
             <option value="6">6 Clients</option>
             <option value="8">8 Clients</option>
           </select>
@@ -131,47 +102,33 @@
       </div>
     </section>
 
-    <!-- Key Metrics Ribbon -->
+    <!-- Metrics Ribbon -->
     <section class="metrics-grid">
       <div class="metric-card card-glass">
-        <div class="metric-label">Global Test Accuracy</div>
+        <div class="metric-label">Accuracy</div>
         <div class="metric-value text-emerald" id="metric-acc">10.00%</div>
-        <div class="metric-trend" id="metric-acc-trend">+0.00% from base</div>
       </div>
 
       <div class="metric-card card-glass">
-        <div class="metric-label">Cross-Entropy Loss</div>
+        <div class="metric-label">Loss</div>
         <div class="metric-value text-amber" id="metric-loss">2.3000</div>
-        <div class="metric-trend" id="metric-loss-trend">Aggregated Weights</div>
       </div>
 
       <div class="metric-card card-glass">
-        <div class="metric-label">Training Progress</div>
+        <div class="metric-label">Round</div>
         <div class="metric-value text-cyan" id="metric-round">0 <span class="metric-sub">/ 20</span></div>
-        <div class="metric-trend" id="metric-progress-pct">Round 0 completed</div>
       </div>
 
       <div class="metric-card card-glass">
-        <div class="metric-label">Attacks Intercepted</div>
+        <div class="metric-label">Interceptions</div>
         <div class="metric-value text-rose" id="metric-attacks">0 <span class="metric-sub">/ 0</span></div>
-        <div class="metric-trend" id="metric-resistance-rate">100% Defense Resistance</div>
       </div>
 
       <div class="metric-card card-glass">
-        <div class="metric-label">Penalties Slashed</div>
-        <div class="metric-value text-purple" id="metric-slashed-stake">0 <span class="metric-sub">FL Tokens</span></div>
-        <div class="metric-trend" id="metric-slashed-count">0 Adversaries Blacklisted</div>
+        <div class="metric-label">Slashed Stake</div>
+        <div class="metric-value text-purple" id="metric-slashed-stake">0 <span class="metric-sub">FL</span></div>
       </div>
     </section>
-
-    <!-- Dynamic Callout Banner -->
-    <div class="algo-callout card-glass" id="algo-callout">
-      <div class="algo-callout-icon" id="callout-icon">🛡️</div>
-      <div class="algo-callout-text">
-        <strong id="callout-title">Blockchain Byzantine Defense Active:</strong>
-        <span id="callout-desc">Incoming model updates are audited via Cosine Proof-of-Direction. Detected poisoners are slashed and permanently blacklisted from the Multi-Armed Bandit pool.</span>
-      </div>
-    </div>
 
     <!-- Main Grid: Charts & Node Visualizer -->
     <div class="main-dashboard-grid">
@@ -180,11 +137,7 @@
         <!-- Learning Curve Chart -->
         <div class="panel card-glass">
           <div class="panel-header">
-            <div>
-              <h2 class="panel-title">Model Convergence & Attack Impact</h2>
-              <p class="panel-subtitle">Accuracy & Loss trajectories under active attack/defense</p>
-            </div>
-            <span class="badge badge-emerald" id="badge-chart-defense">Protected</span>
+            <h2 class="panel-title">Training Convergence</h2>
           </div>
           <div class="chart-container">
             <canvas id="chart-convergence"></canvas>
@@ -194,11 +147,7 @@
         <!-- Shapley Values Chart -->
         <div class="panel card-glass">
           <div class="panel-header">
-            <div>
-              <h2 class="panel-title">Client Marginal Valuation (Shapley Values)</h2>
-              <p class="panel-subtitle">High quality rewarded • Slashed poisoners receive negative score</p>
-            </div>
-            <span class="badge badge-purple">Game Theory Market</span>
+            <h2 class="panel-title">Shapley Values</h2>
           </div>
           <div class="chart-container">
             <canvas id="chart-shapley"></canvas>
@@ -211,10 +160,7 @@
         <!-- 100 Client Nodes Visualizer -->
         <div class="panel card-glass">
           <div class="panel-header">
-            <div>
-              <h2 class="panel-title">Edge Node Security Map (100 Clients)</h2>
-              <p class="panel-subtitle">Dirichlet Non-IID • Honest vs Adversary Nodes</p>
-            </div>
+            <h2 class="panel-title">Client Nodes (100)</h2>
             <div class="legend-group">
               <span class="legend-item"><span class="node-bullet node-current"></span> Batch</span>
               <span class="legend-item"><span class="node-bullet node-honest"></span> Honest</span>
@@ -235,13 +181,13 @@
               <span id="det-status" class="badge"></span>
             </div>
             <div class="client-detail-stats">
-              <div>Role: <span id="det-role"></span></div>
-              <div>Data Size: <span id="det-data"></span> samples</div>
-              <div>Quality Factor: <span id="det-quality"></span></div>
-              <div>Security Stake: <span id="det-stake"></span> FL</div>
-              <div>Times Sampled: <span id="det-sampled"></span></div>
-              <div>Latest Shapley: <span id="det-shapley"></span></div>
-              <div>Total Reward: <span id="det-reward"></span> FL</div>
+              <div>Type: <span id="det-role"></span></div>
+              <div>Samples: <span id="det-data"></span></div>
+              <div>Quality: <span id="det-quality"></span></div>
+              <div>Stake: <span id="det-stake"></span></div>
+              <div>Sampled: <span id="det-sampled"></span></div>
+              <div>Shapley: <span id="det-shapley"></span></div>
+              <div>Reward: <span id="det-reward"></span></div>
             </div>
           </div>
         </div>
@@ -249,17 +195,13 @@
         <!-- Blockchain Ledger & Activity Feed -->
         <div class="panel card-glass ledger-panel">
           <div class="panel-header">
-            <div>
-              <h2 class="panel-title">Blockchain Consensus Ledger</h2>
-              <p class="panel-subtitle">Proof-of-Quality • Smart Contract Audit Trail</p>
-            </div>
-            <span class="badge badge-cyan">On-Chain Audit</span>
+            <h2 class="panel-title">Consensus Ledger</h2>
           </div>
           <div class="ledger-list" id="blockchain-ledger">
             <!-- Dynamically populated blocks -->
           </div>
 
-          <div class="terminal-logs-header">Consensus Event Stream</div>
+          <div class="terminal-logs-header">System Logs</div>
           <div class="terminal-box" id="event-terminal">
             <!-- Dynamically populated logs -->
           </div>
