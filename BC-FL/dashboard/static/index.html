@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BC-FL | Blockchain-Based Federated Learning Service Market</title>
+  <meta name="description" content="Interactive demo dashboard for Blockchain-based Federated Learning with Bandit Client Selection and Shapley Value Contribution Valuation.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- Background Glow FX -->
+  <div class="bg-glow glow-1"></div>
+  <div class="bg-glow glow-2"></div>
+
+  <div class="app-container">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="header-branding">
+        <div class="logo-badge">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </div>
+        <div>
+          <h1 class="app-title">BC-FL Market Explorer</h1>
+          <p class="app-subtitle">Blockchain-Enabled Federated Learning • Bandit Selection • Shapley Valuation</p>
+        </div>
+      </div>
+
+      <div class="header-status">
+        <div class="status-pill server-status">
+          <span class="status-dot pulse-emerald"></span>
+          <span>gRPC Edge Server: <strong>Online</strong> (Port 12345)</span>
+        </div>
+        <div class="status-pill device-status">
+          <span class="status-dot"></span>
+          <span>Model: <strong>ShuffleNetV2</strong></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Control Toolbar -->
+    <section class="toolbar-section card-glass">
+      <div class="controls-left">
+        <button id="btn-start" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span id="btn-start-label">Start Training</span>
+        </button>
+
+        <button id="btn-step" class="btn btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 4 15 12 5 20 5 4"></polygon>
+            <line x1="19" y1="5" x2="19" y2="19"></line>
+          </svg>
+          <span>Step 1 Round</span>
+        </button>
+
+        <button id="btn-reset" class="btn btn-danger-outline">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+          </svg>
+          <span>Reset</span>
+        </button>
+      </div>
+
+      <div class="controls-right">
+        <div class="control-group">
+          <label for="select-algo">Algorithm</label>
+          <select id="select-algo" class="form-select">
+            <option value="Bandit" selected>Bandit (MAB Explore-Exploit)</option>
+            <option value="Random">Random Selection</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="select-sample">Sample Size</label>
+          <select id="select-sample" class="form-select">
+            <option value="3">3 Clients</option>
+            <option value="4" selected>4 Clients (Default)</option>
+            <option value="6">6 Clients</option>
+            <option value="8">8 Clients</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="select-max-rounds">Max Rounds</label>
+          <select id="select-max-rounds" class="form-select">
+            <option value="10">10 Rounds</option>
+            <option value="20" selected>20 Rounds</option>
+            <option value="50">50 Rounds</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Key Metrics Ribbon -->
+    <section class="metrics-grid">
+      <div class="metric-card card-glass">
+        <div class="metric-label">Global Test Accuracy</div>
+        <div class="metric-value text-emerald" id="metric-acc">10.00%</div>
+        <div class="metric-trend" id="metric-acc-trend">+0.00% from base</div>
+      </div>
+
+      <div class="metric-card card-glass">
+        <div class="metric-label">Cross-Entropy Loss</div>
+        <div class="metric-value text-amber" id="metric-loss">2.3000</div>
+        <div class="metric-trend" id="metric-loss-trend">FedAvg Aggregated</div>
+      </div>
+
+      <div class="metric-card card-glass">
+        <div class="metric-label">Current Round</div>
+        <div class="metric-value text-cyan" id="metric-round">0 <span class="metric-sub">/ 20</span></div>
+        <div class="metric-trend" id="metric-progress-pct">0% Completed</div>
+      </div>
+
+      <div class="metric-card card-glass">
+        <div class="metric-label">Exploration Rate (ε)</div>
+        <div class="metric-value text-purple" id="metric-explore">90.0%</div>
+        <div class="metric-trend" id="metric-explore-desc">Decays as optimal nodes identified</div>
+      </div>
+
+      <div class="metric-card card-glass">
+        <div class="metric-label">Batch Data Quality</div>
+        <div class="metric-value text-blue" id="metric-batch-quality">--%</div>
+        <div class="metric-trend" id="metric-batch-desc">Waiting for round...</div>
+      </div>
+    </section>
+
+    <!-- Algorithm Comparison Banner -->
+    <div class="algo-callout card-glass" id="algo-callout">
+      <div class="algo-callout-icon">💡</div>
+      <div class="algo-callout-text">
+        <strong id="callout-title">Bandit (MAB) Active:</strong>
+        <span id="callout-desc">Samples clients using Shapley values. Prunes noisy stragglers and exploits high-quality edge nodes to reach ~88% accuracy with rapid convergence.</span>
+      </div>
+    </div>
+
+    <!-- Middle Section: Visual Charts & Client Node Visualizer -->
+    <div class="main-dashboard-grid">
+      <!-- Left Column: Real-time Charts -->
+      <div class="charts-column">
+        <!-- Learning Curve Chart -->
+        <div class="panel card-glass">
+          <div class="panel-header">
+            <h2 class="panel-title">Model Convergence Curves</h2>
+            <span class="badge badge-cyan">ShuffleNetV2 • CIFAR-10</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-convergence"></canvas>
+          </div>
+        </div>
+
+        <!-- Shapley Values Contribution Chart -->
+        <div class="panel card-glass">
+          <div class="panel-header">
+            <h2 class="panel-title">Top Client Shapley Values (Marginal Contribution)</h2>
+            <span class="badge badge-emerald">Game Theory Valuation</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-shapley"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: 100 Client Grid & Blockchain Stream -->
+      <div class="nodes-column">
+        <!-- 100 Client Nodes Visualizer -->
+        <div class="panel card-glass">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Edge Client Nodes Map (100 Clients)</h2>
+              <p class="panel-subtitle">Dirichlet Non-IID Partitioned Participants</p>
+            </div>
+            <div class="legend-group">
+              <span class="legend-item"><span class="node-bullet node-current"></span> Active Round</span>
+              <span class="legend-item"><span class="node-bullet node-explored"></span> Explored</span>
+              <span class="legend-item"><span class="node-bullet node-unexplored"></span> Unexplored</span>
+            </div>
+          </div>
+
+          <div class="client-grid-wrapper">
+            <div id="clients-grid" class="client-grid">
+              <!-- Dynamically populated 100 nodes -->
+            </div>
+          </div>
+
+          <div id="client-detail-card" class="client-detail-box" style="display: none;">
+            <div class="client-detail-header">
+              <strong id="det-id">Client #</strong>
+              <span id="det-status" class="badge"></span>
+            </div>
+            <div class="client-detail-stats">
+              <div>Data Size: <span id="det-data"></span> samples</div>
+              <div>Quality Factor: <span id="det-quality"></span></div>
+              <div>Times Sampled: <span id="det-sampled"></span></div>
+              <div>Latest Shapley Gain: <span id="det-shapley"></span></div>
+              <div>Market Token Reward: <span id="det-reward"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blockchain Ledger & Activity Feed -->
+        <div class="panel card-glass ledger-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Blockchain Transaction Ledger</h2>
+            <span class="badge badge-purple">Smart Contract Settlement</span>
+          </div>
+          <div class="ledger-list" id="blockchain-ledger">
+            <!-- Dynamically populated blocks -->
+          </div>
+
+          <div class="terminal-logs-header">System Event Stream</div>
+          <div class="terminal-box" id="event-terminal">
+            <!-- Dynamically populated logs -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

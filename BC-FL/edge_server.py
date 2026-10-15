@@ -26,7 +26,7 @@ class EdgeServer(job_api_pb2_grpc.JobServiceServicer):
         self.addr = "localhost:12345"
 
         self.global_model = init_model()
-        self.device = torch.device("cuda")
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         test_dataset = get_dataset(0, 'cifar', True)
         self.test_loader = select_dataset(1, test_dataset, batch_sz, 0, is_test=True)
@@ -37,7 +37,8 @@ class EdgeServer(job_api_pb2_grpc.JobServiceServicer):
         random.seed(seed)
         np.random.seed(seed)
         torch.manual_seed(seed)
-        torch.cuda.manual_seed_all(seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(seed)
         torch.backends.cudnn.deterministic = True
 
     def Connect(self, request, context):
@@ -51,7 +52,8 @@ class EdgeServer(job_api_pb2_grpc.JobServiceServicer):
         # clean memory before training every time
         del self.global_model
         gc.collect()
-        torch.cuda.empty_cache()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
         self.global_model = pickle.loads(request.updates)
 

@@ -28,7 +28,7 @@ class Group(object):
         self.train_loaders = train_loaders
         self.global_model = None
         self.local_models = []
-        self.device = torch.device("cuda")
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         # torch.backends.cudnn.benchmark = True // if enabling it, the GPU memory usage increases a lot!
         self.lr = lr
         self.momentum = momentum
@@ -45,8 +45,9 @@ class Group(object):
         random.seed(seed)
         np.random.seed(seed)
         torch.manual_seed(seed)
-        torch.cuda.manual_seed_all(seed)
-        torch.backends.cudnn.deterministic = True
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(seed)
+            torch.backends.cudnn.deterministic = True
 
     def connect(self, addr):
         # connect to a server
@@ -97,7 +98,8 @@ class Group(object):
                     print(ex)
                     break
             self.local_models[idx] = self.local_models[idx].to('cpu')
-            torch.cuda.empty_cache()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
 
         # average models
         index = [_ for _ in range(len(self.local_models))]
@@ -147,7 +149,8 @@ def run():
         # release memory when a round ends
         del group
         gc.collect()
-        torch.cuda.empty_cache()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
         print("Round {} finished, using {} min".format(r+1, (time.time()-t)/60))
 
 

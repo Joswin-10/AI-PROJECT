@@ -30,18 +30,19 @@ def average_model(model_list, index):
 
 
 def test(model, test_loader, test_data_size):
-    model = model.to('cuda')
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = model.to(device)
 
     total_loss = 0
     total_accuracy = 0
-    criterion = torch.nn.CrossEntropyLoss().to('cuda')
+    criterion = torch.nn.CrossEntropyLoss().to(device)
 
     model.eval()
     test_step = 0
     with torch.no_grad():
         for (X, y) in test_loader:
-            X = X.to('cuda')
-            y = y.to('cuda')
+            X = X.to(device)
+            y = y.to(device)
             output = model(X)
             total_accuracy += (output.argmax(1) == y).sum()
             loss = criterion(output, y)
@@ -49,7 +50,8 @@ def test(model, test_loader, test_data_size):
             test_step += 1
 
     model = model.to('cpu')
-    torch.cuda.empty_cache()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
 
     return total_accuracy.item() / test_data_size
 
