@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BC-FL | Blockchain-Based Federated Learning Service Market</title>
-  <meta name="description" content="Interactive demo dashboard for Blockchain-based Federated Learning with Bandit Client Selection and Shapley Value Contribution Valuation.">
+  <title>BC-FL | Blockchain-Based Decentralized & Secure Federated Learning</title>
+  <meta name="description" content="Interactive demo dashboard for Blockchain-based Federated Learning with Byzantine Poisoning Attacks and Consensus Defense (Information Sciences 2024).">
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,19 +33,19 @@
           </svg>
         </div>
         <div>
-          <h1 class="app-title">BC-FL Market Explorer</h1>
-          <p class="app-subtitle">Blockchain-Enabled Federated Learning • Bandit Selection • Shapley Valuation</p>
+          <h1 class="app-title">BC-FL: Secure AI Market Explorer</h1>
+          <p class="app-subtitle">Towards Blockchain-Enabled Decentralized and Secure Federated Learning • Info. Sciences 2024</p>
         </div>
       </div>
 
       <div class="header-status">
-        <div class="status-pill server-status">
-          <span class="status-dot pulse-emerald"></span>
-          <span>gRPC Edge Server: <strong>Online</strong> (Port 12345)</span>
+        <div class="status-pill server-status" id="pill-defense-status">
+          <span class="status-dot pulse-emerald" id="dot-defense"></span>
+          <span id="text-defense-status">Defense: <strong>Cosine-Filter Active</strong></span>
         </div>
         <div class="status-pill device-status">
           <span class="status-dot"></span>
-          <span>Model: <strong>ShuffleNetV2</strong></span>
+          <span>Model: <strong>ShuffleNetV2</strong> • CIFAR-10</span>
         </div>
       </div>
     </header>
@@ -77,30 +77,55 @@
       </div>
 
       <div class="controls-right">
+        <!-- Blockchain Byzantine Defense Dropdown -->
         <div class="control-group">
-          <label for="select-algo">Algorithm</label>
+          <label for="select-defense" class="text-emerald font-semibold">🛡️ Blockchain Defense</label>
+          <select id="select-defense" class="form-select border-emerald">
+            <option value="Cosine-Filter" selected>Cosine-Filter (Proof-of-Direction)</option>
+            <option value="Multi-Krum">Multi-Krum Byzantine Consensus</option>
+            <option value="Trimmed-Mean">Coordinate-wise Trimmed-Mean</option>
+            <option value="None">None (Vulnerable FedAvg)</option>
+          </select>
+        </div>
+
+        <!-- Adversary Attack Vector -->
+        <div class="control-group">
+          <label for="select-attack-type" class="text-rose font-semibold">⚔️ Attack Vector</label>
+          <select id="select-attack-type" class="form-select border-rose">
+            <option value="Sign-Flipping" selected>Byzantine Sign-Flipping</option>
+            <option value="Label-Flipping">Label-Flipping Poisoning</option>
+            <option value="Extreme-Noise">Extreme Gaussian Noise</option>
+          </select>
+        </div>
+
+        <!-- Adversary Ratio -->
+        <div class="control-group">
+          <label for="select-malicious-ratio">Adversaries</label>
+          <select id="select-malicious-ratio" class="form-select">
+            <option value="0.0">0% (Clean)</option>
+            <option value="0.10">10% Malicious</option>
+            <option value="0.20" selected>20% Malicious</option>
+            <option value="0.30">30% Malicious</option>
+            <option value="0.40">40% Malicious</option>
+          </select>
+        </div>
+
+        <!-- Algorithm Selection -->
+        <div class="control-group">
+          <label for="select-algo">Client Selector</label>
           <select id="select-algo" class="form-select">
-            <option value="Bandit" selected>Bandit (MAB Explore-Exploit)</option>
+            <option value="Bandit" selected>Bandit (MAB + Slashing)</option>
             <option value="Random">Random Selection</option>
           </select>
         </div>
 
         <div class="control-group">
-          <label for="select-sample">Sample Size</label>
+          <label for="select-sample">Batch Size</label>
           <select id="select-sample" class="form-select">
             <option value="3">3 Clients</option>
             <option value="4" selected>4 Clients (Default)</option>
             <option value="6">6 Clients</option>
             <option value="8">8 Clients</option>
-          </select>
-        </div>
-
-        <div class="control-group">
-          <label for="select-max-rounds">Max Rounds</label>
-          <select id="select-max-rounds" class="form-select">
-            <option value="10">10 Rounds</option>
-            <option value="20" selected>20 Rounds</option>
-            <option value="50">50 Rounds</option>
           </select>
         </div>
       </div>
@@ -117,57 +142,63 @@
       <div class="metric-card card-glass">
         <div class="metric-label">Cross-Entropy Loss</div>
         <div class="metric-value text-amber" id="metric-loss">2.3000</div>
-        <div class="metric-trend" id="metric-loss-trend">FedAvg Aggregated</div>
+        <div class="metric-trend" id="metric-loss-trend">Aggregated Weights</div>
       </div>
 
       <div class="metric-card card-glass">
-        <div class="metric-label">Current Round</div>
+        <div class="metric-label">Training Progress</div>
         <div class="metric-value text-cyan" id="metric-round">0 <span class="metric-sub">/ 20</span></div>
-        <div class="metric-trend" id="metric-progress-pct">0% Completed</div>
+        <div class="metric-trend" id="metric-progress-pct">Round 0 completed</div>
       </div>
 
       <div class="metric-card card-glass">
-        <div class="metric-label">Exploration Rate (ε)</div>
-        <div class="metric-value text-purple" id="metric-explore">90.0%</div>
-        <div class="metric-trend" id="metric-explore-desc">Decays as optimal nodes identified</div>
+        <div class="metric-label">Attacks Intercepted</div>
+        <div class="metric-value text-rose" id="metric-attacks">0 <span class="metric-sub">/ 0</span></div>
+        <div class="metric-trend" id="metric-resistance-rate">100% Defense Resistance</div>
       </div>
 
       <div class="metric-card card-glass">
-        <div class="metric-label">Batch Data Quality</div>
-        <div class="metric-value text-blue" id="metric-batch-quality">--%</div>
-        <div class="metric-trend" id="metric-batch-desc">Waiting for round...</div>
+        <div class="metric-label">Penalties Slashed</div>
+        <div class="metric-value text-purple" id="metric-slashed-stake">0 <span class="metric-sub">FL Tokens</span></div>
+        <div class="metric-trend" id="metric-slashed-count">0 Adversaries Blacklisted</div>
       </div>
     </section>
 
-    <!-- Algorithm Comparison Banner -->
+    <!-- Dynamic Callout Banner -->
     <div class="algo-callout card-glass" id="algo-callout">
-      <div class="algo-callout-icon">💡</div>
+      <div class="algo-callout-icon" id="callout-icon">🛡️</div>
       <div class="algo-callout-text">
-        <strong id="callout-title">Bandit (MAB) Active:</strong>
-        <span id="callout-desc">Samples clients using Shapley values. Prunes noisy stragglers and exploits high-quality edge nodes to reach ~88% accuracy with rapid convergence.</span>
+        <strong id="callout-title">Blockchain Byzantine Defense Active:</strong>
+        <span id="callout-desc">Incoming model updates are audited via Cosine Proof-of-Direction. Detected poisoners are slashed and permanently blacklisted from the Multi-Armed Bandit pool.</span>
       </div>
     </div>
 
-    <!-- Middle Section: Visual Charts & Client Node Visualizer -->
+    <!-- Main Grid: Charts & Node Visualizer -->
     <div class="main-dashboard-grid">
-      <!-- Left Column: Real-time Charts -->
+      <!-- Left Column: Charts -->
       <div class="charts-column">
         <!-- Learning Curve Chart -->
         <div class="panel card-glass">
           <div class="panel-header">
-            <h2 class="panel-title">Model Convergence Curves</h2>
-            <span class="badge badge-cyan">ShuffleNetV2 • CIFAR-10</span>
+            <div>
+              <h2 class="panel-title">Model Convergence & Attack Impact</h2>
+              <p class="panel-subtitle">Accuracy & Loss trajectories under active attack/defense</p>
+            </div>
+            <span class="badge badge-emerald" id="badge-chart-defense">Protected</span>
           </div>
           <div class="chart-container">
             <canvas id="chart-convergence"></canvas>
           </div>
         </div>
 
-        <!-- Shapley Values Contribution Chart -->
+        <!-- Shapley Values Chart -->
         <div class="panel card-glass">
           <div class="panel-header">
-            <h2 class="panel-title">Top Client Shapley Values (Marginal Contribution)</h2>
-            <span class="badge badge-emerald">Game Theory Valuation</span>
+            <div>
+              <h2 class="panel-title">Client Marginal Valuation (Shapley Values)</h2>
+              <p class="panel-subtitle">High quality rewarded • Slashed poisoners receive negative score</p>
+            </div>
+            <span class="badge badge-purple">Game Theory Market</span>
           </div>
           <div class="chart-container">
             <canvas id="chart-shapley"></canvas>
@@ -175,19 +206,20 @@
         </div>
       </div>
 
-      <!-- Right Column: 100 Client Grid & Blockchain Stream -->
+      <!-- Right Column: 100 Nodes Map & Blockchain Ledger -->
       <div class="nodes-column">
         <!-- 100 Client Nodes Visualizer -->
         <div class="panel card-glass">
           <div class="panel-header">
             <div>
-              <h2 class="panel-title">Edge Client Nodes Map (100 Clients)</h2>
-              <p class="panel-subtitle">Dirichlet Non-IID Partitioned Participants</p>
+              <h2 class="panel-title">Edge Node Security Map (100 Clients)</h2>
+              <p class="panel-subtitle">Dirichlet Non-IID • Honest vs Adversary Nodes</p>
             </div>
             <div class="legend-group">
-              <span class="legend-item"><span class="node-bullet node-current"></span> Active Round</span>
-              <span class="legend-item"><span class="node-bullet node-explored"></span> Explored</span>
-              <span class="legend-item"><span class="node-bullet node-unexplored"></span> Unexplored</span>
+              <span class="legend-item"><span class="node-bullet node-current"></span> Batch</span>
+              <span class="legend-item"><span class="node-bullet node-honest"></span> Honest</span>
+              <span class="legend-item"><span class="node-bullet node-malicious"></span> Adversary</span>
+              <span class="legend-item"><span class="node-bullet node-slashed"></span> Slashed</span>
             </div>
           </div>
 
@@ -203,11 +235,13 @@
               <span id="det-status" class="badge"></span>
             </div>
             <div class="client-detail-stats">
+              <div>Role: <span id="det-role"></span></div>
               <div>Data Size: <span id="det-data"></span> samples</div>
               <div>Quality Factor: <span id="det-quality"></span></div>
+              <div>Security Stake: <span id="det-stake"></span> FL</div>
               <div>Times Sampled: <span id="det-sampled"></span></div>
-              <div>Latest Shapley Gain: <span id="det-shapley"></span></div>
-              <div>Market Token Reward: <span id="det-reward"></span></div>
+              <div>Latest Shapley: <span id="det-shapley"></span></div>
+              <div>Total Reward: <span id="det-reward"></span> FL</div>
             </div>
           </div>
         </div>
@@ -215,14 +249,17 @@
         <!-- Blockchain Ledger & Activity Feed -->
         <div class="panel card-glass ledger-panel">
           <div class="panel-header">
-            <h2 class="panel-title">Blockchain Transaction Ledger</h2>
-            <span class="badge badge-purple">Smart Contract Settlement</span>
+            <div>
+              <h2 class="panel-title">Blockchain Consensus Ledger</h2>
+              <p class="panel-subtitle">Proof-of-Quality • Smart Contract Audit Trail</p>
+            </div>
+            <span class="badge badge-cyan">On-Chain Audit</span>
           </div>
           <div class="ledger-list" id="blockchain-ledger">
             <!-- Dynamically populated blocks -->
           </div>
 
-          <div class="terminal-logs-header">System Event Stream</div>
+          <div class="terminal-logs-header">Consensus Event Stream</div>
           <div class="terminal-box" id="event-terminal">
             <!-- Dynamically populated logs -->
           </div>

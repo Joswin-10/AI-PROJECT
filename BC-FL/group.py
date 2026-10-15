@@ -101,8 +101,16 @@ class Group(object):
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
 
-        # average models
-        index = [_ for _ in range(len(self.local_models))]
+        # Apply Byzantine defense filtering before aggregation if enabled
+        if hasattr(self, 'defense_method') and self.defense_method == "Cosine-Filter":
+            from utils.security import cosine_similarity_defense
+            accepted_indices, slashed_indices = cosine_similarity_defense(self.local_models, self.client_ids)
+            if slashed_indices:
+                print(f"[!] Blockchain Defense Alert: Slashed adversarial client indices: {slashed_indices}")
+            index = accepted_indices
+        else:
+            index = [_ for _ in range(len(self.local_models))]
+
         self.global_model = average_model(self.local_models, index)
 
         # create request
@@ -121,12 +129,19 @@ class Group(object):
         return shapely_values
 
 
-def run():
+def run(malicious_ratio=0.20, defense_method="Cosine-Filter"):
     batch_sz = 50
     candidates = [_ for _ in range(1, 101)]
     rounds = 50
     selector = Selector(candidates)
     train_dataset = get_dataset(len(candidates), 'cifar', False, method='dirichlet', alpha=0.5)
+
+    num_malicious = int(len(candidates) * malicious_ratio)
+    random.seed(42)
+    malicious_candidates = set(random.sample(candidates, num_malicious))
+    random.seed(int(time.time()))
+
+    print(f"[*] Starting BC-FL Run with {num_malicious} adversaries. Defense: {defense_method}")
 
     for r in range(rounds):
         t = time.time()
@@ -141,6 +156,8 @@ def run():
         server_addr = 'localhost:12345'
 
         group = Group(r+1, participants, train_loaders)
+        group.defense_method = defense_method
+        group.malicious_ids = malicious_candidates
         group.connect(server_addr)
         group.train()
         selector.update_contribution(group.get_shapley_values())
